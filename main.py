@@ -9,7 +9,7 @@ import warnings
 from sklearn.exceptions import UndefinedMetricWarning
 import os
 
-from src.data.internal import New_load_SEMES_dataset
+from src.data.internal import load_dataset
 
 from src.log.logger import setup_logger
 from src.utils.data_config import save_result_to_csv
@@ -21,8 +21,8 @@ def main(args):
     # load data
     args.dataset = args.dataset.lower()
 
-    if args.dataset == "semes_new":
-        x_data, y_true = New_load_SEMES_dataset(
+    if args.dataset == "labeled":
+        x_data, y_true = load_dataset(
             log_num=args.log_num, step=args.step, anomaly_col=args.anomaly_col
         )
     else:
@@ -96,18 +96,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default="semes_new",
-        help="Dataset name ex) semes, swat, semes_new",
+        default="labeled",
+        help="Dataset name ex) labeled, unlabeled",
     )
-    parser.add_argument(
-        "--log_num", type=int, default=260, help="Log_num of SEMES_DATASET"
-    )
-    parser.add_argument("--step", type=int, default=6, help="Step of SEMES_DATASET")
+    parser.add_argument("--log_num", type=int, default=260, help="Log_num of DATASET")
+    parser.add_argument("--step", type=int, default=6, help="Step of DATASET")
     parser.add_argument(
         "--anomaly_col",
         type=str,
         default="label",
-        help="Anomaly column name of SEMES_DATASET",
+        help="Anomaly column name of DATASET",
     )
 
     args = parser.parse_args()

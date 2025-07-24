@@ -78,7 +78,7 @@ def save_result_to_csv(best_y_pred, dataset: str, policy: str, anomaly_col: str)
     """
     예측 결과를 CSV 파일로 저장하는 함수
     :param best_y_pred: 예측 결과
-    :param dataset: 데이터셋 이름 (예: SEMES, SWaT)
+    :param dataset: 데이터셋 이름 (예: labeled, unlabeled)
     :param policy: 정책 이름 (예: naive, hard, soft)
     """
 
