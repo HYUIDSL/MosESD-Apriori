@@ -1,0 +1,16 @@
+# 데이터
+data/
+result/
+results/
+
+# log
+log/
+
+# pycache
+__pycache__/
+
+# venv
+venv/
+
+# config
+config.yaml
