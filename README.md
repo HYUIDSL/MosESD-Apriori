@@ -1,4 +1,4 @@
-# MosESD-Apriori
+# MosESD-Apriori (2025)
 
 MosESD(Multi-online Extreme Studentized Deviate) 알고리즘에 Apriori 알고리즘을 적용하여 피처 선택 기능을 추가한 이상 탐지 시스템
 
