@@ -1,36 +1,46 @@
 import numpy as np
+from sklearn.metrics import recall_score, precision_score
+
+def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    recall = recall_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred)
+    denom = precision + recall
+    f1_score = 0.0 if denom == 0 else 2 * (precision * recall) / denom
+    return f1_score, recall, precision
 
 
-def f1_score(y_true, y_pred):
-    """
-    실제 레이블과 예측 레이블을 입력받아 F1 score를 계산하는 함수입니다.
+def pa_f1_score(y_true, y_pred):
+    y_true = np.asarray(y_true, dtype=int)
+    y_pred = np.asarray(y_pred, dtype=int)
+    
+    y_pred_adj = y_pred.copy()
+    
+    diff = np.diff(np.r_[0, y_true, 0])
+    starts = np.where(diff == 1)[0]
+    ends = np.where(diff == -1)[0]
+    
+    for start, end in zip(starts, ends):
+        if np.sum(y_pred[start:end]) > 0:
+            y_pred_adj[start:end] = 1
+    
+    pa_f1, pa_recall, pa_precision = f1_score(y_true, y_pred_adj)
+    return pa_f1, pa_recall, pa_precision
 
-    Parameters:
-        y_true (array-like): 실제 레이블.
-        y_pred (array-like): 예측 레이블.
 
-    Returns:
-        float: 계산된 F1 score.
-    """
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
+def get_metric_fn(metric: str, args=None):
+    name = (metric or "f1").lower()
 
-    # True Positive: 실제와 예측이 모두 1인 경우
-    tp = np.sum((y_true == 1) & (y_pred == 1))
-    # False Positive: 실제는 0인데 예측이 1인 경우
-    fp = np.sum((y_true == 0) & (y_pred == 1))
-    # False Negative: 실제는 1인데 예측이 0인 경우
-    fn = np.sum((y_true == 1) & (y_pred == 0))
+    if name in ("f1", "plain_f1", "basic_f1"):
+        return f1_score
 
-    # Precision과 Recall 계산
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    if name in ("pa_f1", "point_adjustment_f1", "point_adjusted_f1"):
+        return pa_f1_score
 
-    # F1 Score 계산: Precision과 Recall의 조화평균
-    f1 = (
-        2 * (precision * recall) / (precision + recall)
-        if (precision + recall) > 0
-        else 0
-    )
+    raise ValueError(f"Unsupported metric: {metric}")
 
-    return f1
+
+def evaluate_metrics(y_true, y_pred):
+    f1, recall, precision = f1_score(y_true, y_pred)
+    pa_f1, pa_recall, pa_precision = pa_f1_score(y_true, y_pred)
+    
+    return f1, recall, precision, pa_f1, pa_recall, pa_precision
